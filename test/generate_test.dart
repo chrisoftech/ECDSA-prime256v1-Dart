@@ -13,6 +13,22 @@ void main() {
     _secureRandom = _generator.getSecureRandom();
   });
 
+  test('should return true if secure-random generates 100 distinct values', () {
+    final _generatedRandoms = <int>[];
+    bool _hasConflict = false;
+
+    for (int i = 0; i < 100; i++) {
+      final _genRandom = _generator.getSecureRandom();
+
+      if (_generatedRandoms.contains(_genRandom.hashCode)) {
+        _hasConflict = true;
+        break;
+      }
+    }
+
+    expect(_hasConflict, equals(false));
+  });
+
   test('should generate a secp256k1 key pair', () {
     final AsymmetricKeyPair<PublicKey, PrivateKey> generatedKeyPair =
         secp256k1KeyPair(_secureRandom);
