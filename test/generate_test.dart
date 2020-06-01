@@ -24,6 +24,8 @@ void main() {
         _hasConflict = true;
         break;
       }
+
+      _generatedRandoms.add(_genRandom.hashCode);
     }
 
     expect(_hasConflict, equals(false));
