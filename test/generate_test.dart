@@ -17,7 +17,7 @@ void main() {
   });
 
   test(
-      'should return true if different instances of random generator return the same values',
+      'Different instances of getSecureRandom method should not return the same values',
       () {
     final _genSeed1 = _generator.getSecureRandom().nextBytes(32).toList();
     final _genSeed2 = _generator.getSecureRandom().nextBytes(32).toList();
