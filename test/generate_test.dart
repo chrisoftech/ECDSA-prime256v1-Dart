@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:cryptography_test/util/generator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pointycastle/api.dart';
 import 'package:matcher/matcher.dart';
@@ -13,22 +16,37 @@ void main() {
     _secureRandom = _generator.getSecureRandom();
   });
 
-  test('should return true if secure-random generates 100 distinct values', () {
-    final _generatedRandoms = <int>[];
+  test(
+      'Different instances of getSecureRandom method should not return the same values',
+      () {
+    final _genSeed1 = _generator.getSecureRandom().nextBytes(32).toList();
+    final _genSeed2 = _generator.getSecureRandom().nextBytes(32).toList();
+
+    print('GEN 1 $_genSeed1');
+    print('GEN 2 $_genSeed2');
+
+    expect(_genSeed1, isNot(equals(_genSeed2)));
+  });
+
+  test("Should return true if generated seed has a conflict", () {
     bool _hasConflict = false;
 
-    for (int i = 0; i < 100; i++) {
-      final _genRandom = _generator.getSecureRandom();
+    final _seeds = <List<int>>[];
 
-      if (_generatedRandoms.contains(_genRandom.hashCode)) {
-        _hasConflict = true;
-        break;
+    for (int i = 0; i < 100; i++) {
+      final _genSeed = _generator.getSecureRandom().nextBytes(32);
+
+      for (final seed in _seeds) {
+        if (listEquals(seed, _genSeed.toList())) {
+          _hasConflict = true;
+          break;
+        }
       }
 
-      _generatedRandoms.add(_genRandom.hashCode);
+      _seeds.add(_genSeed);
     }
 
-    expect(_hasConflict, equals(false));
+    expect(_hasConflict, false);
   });
 
   test('should generate a secp256k1 key pair', () {

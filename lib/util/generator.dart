@@ -17,14 +17,20 @@ class Generator {
   }
 
   SecureRandom getSecureRandom() {
-    final secureRandom = FortunaRandom();
-    final random = Random.secure();
-    List<int> seeds = [];
-    for (int i = 0; i < 32; i++) {
-      seeds.add(random.nextInt(255));
-    }
-    secureRandom.seed(KeyParameter(Uint8List.fromList(seeds)));
-    return secureRandom;
+    final _secureRandom = FortunaRandom();
+    final _random = Random.secure();
+
+    final _seed = List<int>.generate(32, (_) => _random.nextInt(256));
+
+    final _key = Uint8List.fromList(_seed);
+    final _keyParam = KeyParameter(_key);
+
+    _secureRandom.seed(_keyParam);
+
+    // generates the next bytes
+    _secureRandom.nextBytes(32);
+
+    return _secureRandom;
   }
 
   // Encode Private key to PEM Format
@@ -97,8 +103,10 @@ class Generator {
 AsymmetricKeyPair<PublicKey, PrivateKey> secp256k1KeyPair(SecureRandom random) {
   final keyParams = ECKeyGeneratorParameters(ECCurve_prime256v1());
 
-  // final random = FortunaRandom();
-  // random.seed(KeyParameter(_seed()));
+  // final _random = FortunaRandom();
+  // _random.seed(KeyParameter(Generator().getSecureRandomWithAutoSeed()));
+
+  print(random.nextUint8());
 
   final generator = ECKeyGenerator();
   generator.init(ParametersWithRandom(keyParams, random));
